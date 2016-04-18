@@ -1,0 +1,34 @@
+{
+  "name": "shift-spec-consumer",
+  "version": "1.0.0",
+  "description": "Parse shift-spec into a more usable form",
+  "author": "Shape Security Labs",
+  "homepage": "https://github.com/shapesecurity/shift-spec-consumer",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/shapesecurity/shift-spec-consumer.git"
+  },
+  "main": "index.js",
+  "engines": {
+    "node": ">= 5.0.0"
+  },
+  "dependencies": {
+    "webidl2": "^2.0.11"
+  },
+  "keywords": [
+    "Shift",
+    "AST",
+    "node",
+    "parser",
+    "Parser",
+    "API",
+    "parse",
+    "abstract",
+    "syntax",
+    "tree"
+  ],
+  "bugs": {
+    "url": "https://github.com/shapesecurity/shift-spec-consumer/issues"
+  },
+  "license": "Apache-2.0"
+}
