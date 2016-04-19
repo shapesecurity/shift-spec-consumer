@@ -23,12 +23,12 @@ The object returned by calling this module's default export appropriately has th
 
 `nodes` is a map from node names (as strings) to objects of the form
 ```js
-{attributes, isLeaf, parents}
+{attributes, children, parents}
 ```
 
 where
 - `attributes` is an ordered list of objects of the form `{name, type, inherited}`, where those attributes are respectively a string, a type (see below), and a boolean indicating whether this field is inherited.
-- `isLeaf` is a boolean indicating whether this node has no descendents
+- `children` is a list of names of nodes which descend from this node
 - `parents` is a list of names of nodes from which this node descends.
 
 `enums` is a map from names to lists of strings, which were enums in the spec.

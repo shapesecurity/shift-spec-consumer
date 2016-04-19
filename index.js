@@ -21,7 +21,6 @@ let webIDL = require('webidl2');
 let nodes;
 let enums;
 let idlTypes;
-let superTypes;
 let namedTypesIDL;
 let namedTypes;
 let valueTypes;
@@ -93,7 +92,6 @@ function isSimpleIdlType(type) {
 
 function inherits(type, parent) {
   nodes.get(type).parents.push(parent);
-  superTypes.add(parent);
 }
 
 function idlTypeToType(t) {
@@ -196,7 +194,6 @@ exports.default = function(shiftSpecIdl, shiftSpecAttributeOrdering) {
   nodes = new Map;
   enums = new Map;
   idlTypes = new Map;
-  superTypes = new Set;
   namedTypesIDL = new Map;
   namedTypes = new Map;
   valueTypes = new Map([['DOMString', Value('string')], ['boolean', Value('boolean')], ['double', Value('double')]]);
@@ -212,7 +209,7 @@ exports.default = function(shiftSpecIdl, shiftSpecAttributeOrdering) {
         throw `Overloaded type ${type.name}`;
       }
       nodes.set(type.name, {
-        isLeaf: true,
+        children: [],
         parents: []
       });
       if (type.inheritance !== null) {
@@ -235,8 +232,9 @@ exports.default = function(shiftSpecIdl, shiftSpecAttributeOrdering) {
     }
   }
 
-  superTypes.forEach(t => {nodes.get(t).isLeaf = false;});
-  namedTypesIDL.forEach((v, k) => namedTypes.set(k, idlTypeToType(v)));
+  nodes.forEach((node, name) => {node.parents.forEach(p => {nodes.get(p).children.push(name);});});
+
+  namedTypesIDL.forEach((v, k) => {namedTypes.set(k, idlTypeToType(v));});
 
   // Then set up the attributes for each type
   for (let name of nodes.keys()) {
