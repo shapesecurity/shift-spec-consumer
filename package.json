@@ -12,9 +12,6 @@
   "files": [
     "dist"
   ],
-  "engines": {
-    "node": ">= 5.0.0"
-  },
   "scripts": {
     "test": "mocha --compilers js:babel-register --inline-diffs --check-leaks --ui tdd --reporter dot test",
     "build": "babel --source-maps-inline --out-dir dist src",
