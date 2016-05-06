@@ -16,6 +16,16 @@
 
 "use strict";
 
+if (!Array.from) {
+  Array.from = function(a) {
+    let x = [];
+    let y;
+    while (y = a.next(), !y.done) {
+      x.push(y.value);
+    }
+    return x;
+  }
+}
 let webIDL = require('webidl2');
 
 let nodes;
@@ -232,8 +242,8 @@ module.exports = function(shiftSpecIdl, shiftSpecAttributeOrdering) {
     }
   }
 
-  if (!unsortedArrayEquals(Array.from(nodes.keys()), Array.from(attrOrders.keys()))) {
-    throw new Error(`List of nodes from spec ${Array.from(nodes.keys())} does not match list of nodes from attribute-order ${Array.from(attrOrders.keys())}`);
+  if (!unsortedArrayEquals([...nodes.keys()], [...attrOrders.keys()])) {
+    throw new Error(`List of nodes from spec ${[...nodes.keys()]} does not match list of nodes from attribute-order ${[...attrOrders.keys()]}`);
   }
 
   nodes.forEach((node, name) => {node.parents.forEach(p => {nodes.get(p).children.push(name);});});
