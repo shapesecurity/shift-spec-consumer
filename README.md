@@ -15,7 +15,7 @@ npm install shift-spec-consumer
 ## Usage
 
 ```es6
-let specConsumer = require("shift-spec-consumer").default;
+let specConsumer = require("shift-spec-consumer");
 let {nodes, enums, namedTypes} = specConsumer(/* contents of spec.idl */, /* contents of attribute-order.conf */);
 ```
 

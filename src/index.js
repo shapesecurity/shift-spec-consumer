@@ -38,7 +38,7 @@ function parseAttrOrder(f) {
     if (line[0] === '[') {
       let matches = line.match(/^\[([^\]]*)\]$/);
       if (!matches) {
-        throw `Couldn't parse ${line}`;
+        throw new Error(`Couldn't parse ${line}`);
       }
       let type = matches[1]
       current = [];
@@ -109,7 +109,7 @@ function idlTypeToType(t) {
     if (enums.has(t)) {
       return Enum(t);
     }
-    throw `Unidentified type ${t}`;
+    throw new Error(`Unidentified type ${t}`);
   }
 
   if (isSimpleIdlType(t)) {
@@ -119,12 +119,12 @@ function idlTypeToType(t) {
   if (t.nullable) {
     if (t.union) {
       if (t.sequence || t.generic || t.array || !Array.isArray(t.idlType)) {
-        throw `Complex nullable-union type ${JSON.stringify(t, null, '  ')}`;
+        throw new Error(`Complex nullable-union type ${JSON.stringify(t, null, '  ')}`);
       }
       return Nullable(Union(t.idlType.map(idlTypeToType)));
     }
     if (t.sequence || t.generic || t.array || t.union || typeof t.idlType !== 'string') {
-      throw `Complex nullable type ${JSON.stringify(t, null, '  ')}`;
+      throw new Error(`Complex nullable type ${JSON.stringify(t, null, '  ')}`);
     }
     return Nullable(idlTypeToType(t.idlType));
   }
@@ -132,7 +132,7 @@ function idlTypeToType(t) {
   if (t.array === 1) {
     if (t.union) {
       if (t.sequence || t.generic || !Array.isArray(t.idlType)) {
-        throw `Complex array-of-union type ${JSON.stringify(t, null, '  ')}`;
+        throw new Error(`Complex array-of-union type ${JSON.stringify(t, null, '  ')}`);
       }
       if (t.nullableArray[0]) {
         return List(Nullable(Union(t.idlType.map(idlTypeToType))));
@@ -140,7 +140,7 @@ function idlTypeToType(t) {
       return List(Union(t.idlType.map(idlTypeToType)));
     }
     if (t.sequence || t.generic || typeof t.idlType !== 'string') {
-      throw `Complex array type ${JSON.stringify(t, null, '  ')}`;
+      throw new Error(`Complex array type ${JSON.stringify(t, null, '  ')}`);
     }
     if (t.nullableArray[0]) {
       return List(Nullable(idlTypeToType(t.idlType)));
@@ -150,12 +150,12 @@ function idlTypeToType(t) {
 
   if (t.union) {
     if (t.sequence || t.generic || t.array || !Array.isArray(t.idlType)) {
-      throw `Complex union type ${JSON.stringify(t, null, '  ')}`;
+      throw new Error(`Complex union type ${JSON.stringify(t, null, '  ')}`);
     }
     return Union(t.idlType.map(idlTypeToType));
   }
 
-  throw `Unsupported IDL type ${JSON.stringify(t, null, '  ')}`;
+  throw new Error(`Unsupported IDL type ${JSON.stringify(t, null, '  ')}`);
 }
 
 function setAttrs(name) {
@@ -179,17 +179,17 @@ function setAttrs(name) {
   })));
   let attrOrder = attrOrders.get(name);
   if (attrOrder === void 0) {
-    throw `${name} does not have an attribute ordering specified`;
+    throw new Error(`${name} does not have an attribute ordering specified`);
   }
   if (!unsortedArrayEquals(attrOrder, attrs.map(a => a.name))) {
-    throw `${name}'s ordered attribute list (${JSON.stringify(attrOrder)}) does not agree with the list of attributes derived from the IDL (${JSON.stringify(attrs.map(a => a.name))})`;
+    throw new Error(`${name}'s ordered attribute list (${JSON.stringify(attrOrder)}) does not agree with the list of attributes derived from the IDL (${JSON.stringify(attrs.map(a => a.name))})`);
   }
 
   attrs.sort((a, b) => attrOrder.indexOf(a.name) - attrOrder.indexOf(b.name));
 }
 
 
-exports.default = function(shiftSpecIdl, shiftSpecAttributeOrdering) {
+module.exports = function(shiftSpecIdl, shiftSpecAttributeOrdering) {
 
   nodes = new Map;
   enums = new Map;
@@ -206,7 +206,7 @@ exports.default = function(shiftSpecIdl, shiftSpecAttributeOrdering) {
     if (type.type === 'interface') {
       idlTypes.set(type.name, type);
       if (nodes.has(type.name) || namedTypesIDL.has(type.name) || enums.has(type.name)) {
-        throw `Overloaded type ${type.name}`;
+        throw new Error(`Overloaded type ${type.name}`);
       }
       nodes.set(type.name, {
         children: [],
@@ -219,17 +219,21 @@ exports.default = function(shiftSpecIdl, shiftSpecAttributeOrdering) {
       inherits(type.target, type.implements);
     } else if (type.type === 'typedef') {
       if (nodes.has(type.name) || namedTypesIDL.has(type.name) || enums.has(type.name)) {
-        throw `Overloaded type ${type.name}`;
+        throw new Error(`Overloaded type ${type.name}`);
       }
       namedTypesIDL.set(type.name, type.idlType);
     } else if (type.type === 'enum') {
       if (nodes.has(type.name) || namedTypesIDL.has(type.name) || enums.has(type.name)) {
-        throw `Overloaded type ${type.name}`;
+        throw new Error(`Overloaded type ${type.name}`);
       }
       enums.set(type.name, type.values);
     } else {
-      throw `Unsupported type ${type}`;
+      throw new Error(`Unsupported type ${type}`);
     }
+  }
+
+  if (!unsortedArrayEquals(Array.from(nodes.keys()), Array.from(attrOrders.keys()))) {
+    throw new Error(`List of nodes from spec ${Array.from(nodes.keys())} does not match list of nodes from attribute-order ${Array.from(attrOrders.keys())}`);
   }
 
   nodes.forEach((node, name) => {node.parents.forEach(p => {nodes.get(p).children.push(name);});});
