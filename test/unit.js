@@ -35,22 +35,46 @@ suite('passing unit', () => {
       x
       `;
 
-    let {enums, namedTypes, nodes} = specConsumer(src, attributes);
-    assert.deepEqual({enums, namedTypes, nodes}, {enums: new Map, namedTypes: new Map, nodes: new Map});
-    assert.equal(enums.size, 0);
-    assert.equal(namedTypes.size, 0);
-    assert.equal(nodes.size, 1);
-    assert.deepEqual(nodes.get('A'), {
-      attributes: [{
-        name: 'x',
-        inherited: false,
-        type: {
-          kind: 'value',
-          argument: 'double'
-        }
-      }],
-      children: [],
-      parents: []
+    assert.deepEqual(specConsumer(src, attributes), {
+      enums: new Map,
+      namedTypes: new Map,
+      nodes: new Map([['A', {
+        attributes: [{
+          name: 'x',
+          inherited: false,
+          type: {
+            kind: 'value',
+            argument: 'double'
+          }
+        }],
+        children: [],
+        parents: []
+      }]])
+    });
+  });
+
+  test('"string" type is not an alias', () => {
+    const src = `typedef DOMString string; interface A { attribute string x; };`;
+    const attributes = `
+      [A]
+      x
+      `;
+
+    assert.deepEqual(specConsumer(src, attributes), {
+      enums: new Map,
+      namedTypes: new Map,
+      nodes: new Map([['A', {
+        attributes: [{
+          name: 'x',
+          inherited: false,
+          type: {
+            kind: 'value',
+            argument: 'string'
+          }
+        }],
+        children: [],
+        parents: []
+      }]])
     });
   });
 
@@ -62,30 +86,29 @@ suite('passing unit', () => {
       y
       `;
 
-    let {enums, namedTypes, nodes} = specConsumer(src, attributes);
-    assert.deepEqual({enums, namedTypes, nodes}, {enums: new Map, namedTypes: new Map, nodes: new Map});
-    assert.equal(enums.size, 0);
-    assert.equal(namedTypes.size, 0);
-    assert.equal(nodes.size, 1);
-    assert.deepEqual(nodes.get('A'), {
-      attributes: [{
-        name: 'x',
-        inherited: false,
-        type: {
-          kind: 'value',
-          argument: 'double'
-        }
-      },
-      {
-        name: 'y',
-        inherited: false,
-        type: {
-          kind: 'value',
-          argument: 'double'
-        }
-      }],
-      children: [],
-      parents: []
+    assert.deepEqual(specConsumer(src, attributes), {
+      enums: new Map,
+      namedTypes: new Map,
+      nodes: new Map([['A', {
+        attributes: [{
+          name: 'x',
+          inherited: false,
+          type: {
+            kind: 'value',
+            argument: 'double'
+          }
+        },
+        {
+          name: 'y',
+          inherited: false,
+          type: {
+            kind: 'value',
+            argument: 'double'
+          }
+        }],
+        children: [],
+        parents: []
+      }]])
     });
   });
 
@@ -122,71 +145,68 @@ suite('passing unit', () => {
       d
       `;
 
-    let {enums, namedTypes, nodes} = specConsumer(src, attributes);
-    assert.deepEqual({enums, namedTypes, nodes}, {enums: new Map, namedTypes: new Map, nodes: new Map});
-    assert.equal(enums.size, 0);
-    assert.equal(namedTypes.size, 0);
-    assert.equal(nodes.size, 4);
-
-    assert.deepEqual(nodes.get('A'), {
-      attributes: [],
-      children: ['B', 'C'],
-      parents: []
-    });
-
-    assert.deepEqual(nodes.get('B'), {
-      attributes: [{
-        name: 'b',
-        inherited: false,
-        type: {
-          kind: 'value',
-          argument: 'double'
-        }
-      }],
-      children: ['D'],
-      parents: ['A']
-    });
-
-    assert.deepEqual(nodes.get('C'), {
-      attributes: [{
-        name: 'c',
-        inherited: false,
-        type: {
-          kind: 'value',
-          argument: 'double'
-        }
-      }],
-      children: ['D'],
-      parents: ['A']
-    });
-
-    assert.deepEqual(nodes.get('D'), {
-      attributes: [{
-        name: 'b',
-        inherited: true,
-        type: {
-          kind: 'value',
-          argument: 'double'
-        }
-      },
-      {
-        name: 'c',
-        inherited: true,
-        type: {
-          kind: 'value',
-          argument: 'double'
-        }
-      },
-      {
-        name: 'd',
-        inherited: false,
-        type: {
-          kind: 'value',
-          argument: 'double'
-        }
-      }],
-      children: [],
-      parents: ['B', 'C']
+    assert.deepEqual(specConsumer(src, attributes), {
+      enums: new Map,
+      namedTypes: new Map,
+      nodes: new Map([
+        ['A', {
+          attributes: [],
+          children: ['B', 'C'],
+          parents: []
+        }],
+        ['B', {
+          attributes: [{
+            name: 'b',
+            inherited: false,
+            type: {
+              kind: 'value',
+              argument: 'double'
+            }
+          }],
+          children: ['D'],
+          parents: ['A']
+        }],
+        ['C', {
+          attributes: [{
+            name: 'c',
+            inherited: false,
+            type: {
+              kind: 'value',
+              argument: 'double'
+            }
+          }],
+          children: ['D'],
+          parents: ['A']
+        }],
+        ['D', {
+          attributes: [{
+            name: 'b',
+            inherited: true,
+            type: {
+              kind: 'value',
+              argument: 'double'
+            }
+          },
+          {
+            name: 'c',
+            inherited: true,
+            type: {
+              kind: 'value',
+              argument: 'double'
+            }
+          },
+          {
+            name: 'd',
+            inherited: false,
+            type: {
+              kind: 'value',
+              argument: 'double'
+            }
+          }],
+          children: [],
+          parents: ['B', 'C']
+        }],
+      ])
     });
   });
 
@@ -203,28 +223,22 @@ suite('passing unit', () => {
       x
       `;
 
-    let {enums, namedTypes, nodes} = specConsumer(src, attributes);
-    assert.deepEqual({enums, namedTypes, nodes}, {enums: new Map, namedTypes: new Map, nodes: new Map});
-    assert.equal(enums.size, 0);
-    assert.equal(namedTypes.size, 1);
-
-    assert.deepEqual(namedTypes.get('B'), {kind: 'value', argument: 'double'});
-
-    assert.equal(nodes.size, 1);
-
-    assert.deepEqual(nodes.get('A'), {
-      attributes: [{
-        name: 'x',
-        inherited: false,
-        type: {
-          kind: 'namedType',
-          argument: 'B'
-        }
-      }],
-      children: [],
-      parents: []
+    assert.deepEqual(specConsumer(src, attributes), {
+      enums: new Map,
+      namedTypes: new Map([['B', {kind: 'value', argument: 'double'}]]),
+      nodes: new Map([['A', {
+        attributes: [{
+          name: 'x',
+          inherited: false,
+          type: {
+            kind: 'namedType',
+            argument: 'B'
+          }
+        }],
+        children: [],
+        parents: []
+      }]])
     });
-
   });
 
   test('Enums', () => {
@@ -240,28 +254,22 @@ suite('passing unit', () => {
       x
       `;
 
-    let {enums, namedTypes, nodes} = specConsumer(src, attributes);
-    assert.deepEqual({enums, namedTypes, nodes}, {enums: new Map, namedTypes: new Map, nodes: new Map});
-    assert.equal(enums.size, 1);
-    
-    assert.deepEqual(enums.get('En'), ['1', 'two']);
-
-    assert.equal(namedTypes.size, 0);
-    assert.equal(nodes.size, 1);
-
-    assert.deepEqual(nodes.get('A'), {
-      attributes: [{
-        name: 'x',
-        inherited: false,
-        type: {
-          kind: 'enum',
-          argument: 'En'
-        }
-      }],
-      children: [],
-      parents: []
+    assert.deepEqual(specConsumer(src, attributes), {
+      enums: new Map([['En', ['1', 'two']]]),
+      namedTypes: new Map,
+      nodes: new Map([['A', {
+        attributes: [{
+          name: 'x',
+          inherited: false,
+          type: {
+            kind: 'enum',
+            argument: 'En'
+          }
+        }],
+        children: [],
+        parents: []
+      }]])
     });
-
   });
 
   test('Compound types parse', () => {
@@ -294,84 +302,61 @@ suite('passing unit', () => {
       [C]
       `;
 
-    let {enums, namedTypes, nodes} = specConsumer(src, attributes);
-    assert.deepEqual({enums, namedTypes, nodes}, {enums: new Map, namedTypes: new Map, nodes: new Map});
-    assert.equal(enums.size, 0);
-    assert.equal(namedTypes.size, 0);
-    assert.equal(nodes.size, 3);
-
-    assert.deepEqual(nodes.get('A'), {
-      attributes: [{
-        name: 'a',
-        inherited: false,
-        type: {
-          kind: 'value',
-          argument: 'double'
-        }
-      },
-      {
-        name: 'b',
-        inherited: false,
-        type: {
-          kind: 'value',
-          argument: 'string'
-        }
-      },
-      {
-        name: 'c',
-        inherited: false,
-        type: {
-          kind: 'node',
-          argument: 'B'
-        }
-      },
-      {
-        name: 'd',
-        inherited: false,
-        type: {
-          kind: 'nullable',
-          argument: {
-            kind: 'value',
-            argument: 'double'
-          }
-        }
-      },
-      {
-        name: 'e',
-        inherited: false,
-        type: {
-          kind: 'list',
-          argument: {
-            kind: 'value',
-            argument: 'double'
-          }
-        }
-      },
-      {
-        name: 'f',
-        inherited: false,
-        type: {
-          kind: 'union',
-          argument: [
-            {
+    assert.deepEqual(specConsumer(src, attributes), {
+      enums: new Map,
+      namedTypes: new Map,
+      nodes: new Map([
+        ['A', {
+          attributes: [{
+            name: 'a',
+            inherited: false,
+            type: {
+              kind: 'value',
+              argument: 'double'
+            }
+          },
+          {
+            name: 'b',
+            inherited: false,
+            type: {
+              kind: 'value',
+              argument: 'string'
+            }
+          },
+          {
+            name: 'c',
+            inherited: false,
+            type: {
               kind: 'node',
               argument: 'B'
-            },
-            {
-              kind: 'node',
-              argument: 'C'
             }
-          ]
-        }
-      },
-      {
-        name: 'g',
-        inherited: false,
-        type: {
-          kind: 'list',
-          argument: {
-            kind: 'nullable',
-            argument: {
+          },
+          {
+            name: 'd',
+            inherited: false,
+            type: {
+              kind: 'nullable',
+              argument: {
+                kind: 'value',
+                argument: 'double'
+              }
+            }
+          },
+          {
+            name: 'e',
+            inherited: false,
+            type: {
+              kind: 'list',
+              argument: {
+                kind: 'value',
+                argument: 'double'
+              }
+            }
+          },
+          {
+            name: 'f',
+            inherited: false,
+            type: {
               kind: 'union',
               argument: [
                 {
@@ -384,11 +369,44 @@ suite('passing unit', () => {
                 }
               ]
             }
-          }
-        }
-      }],
-      children: [],
-      parents: []
+          },
+          {
+            name: 'g',
+            inherited: false,
+            type: {
+              kind: 'list',
+              argument: {
+                kind: 'nullable',
+                argument: {
+                  kind: 'union',
+                  argument: [
+                    {
+                      kind: 'node',
+                      argument: 'B'
+                    },
+                    {
+                      kind: 'node',
+                      argument: 'C'
+                    }
+                  ]
+                }
+              }
+            }
+          }],
+          children: [],
+          parents: []
+        }],
+        ['B', {
+          attributes: [],
+          children: [],
+          parents: []
+        }],
+        ['C', {
+          attributes: [],
+          children: [],
+          parents: []
+        }],
+      ])
     });
   });
 });
