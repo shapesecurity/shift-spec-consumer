@@ -206,7 +206,7 @@ module.exports = function(shiftSpecIdl, shiftSpecAttributeOrdering) {
   idlTypes = new Map;
   namedTypesIDL = new Map;
   namedTypes = new Map;
-  valueTypes = new Map([['DOMString', Value('string')], ['boolean', Value('boolean')], ['double', Value('double')]]);
+  valueTypes = new Map([['string', Value('string')], ['DOMString', Value('string')], ['boolean', Value('boolean')], ['double', Value('double')]]);
 
   spec = webIDL.parse(shiftSpecIdl);
   attrOrders = parseAttrOrder(shiftSpecAttributeOrdering);
@@ -228,6 +228,13 @@ module.exports = function(shiftSpecIdl, shiftSpecAttributeOrdering) {
     } else if (type.type === 'implements') {
       inherits(type.target, type.implements);
     } else if (type.type === 'typedef') {
+      if (type.name === 'string') {
+        let alias = type.idlType;
+        if (alias.idlType !== 'DOMString' || alias.sequence || alias.generic !== null || alias.nullable || alias.array || alias.union) {
+          throw new Error('"string" type is not just an alias for DOMString');
+        }
+        continue;
+      }
       if (nodes.has(type.name) || namedTypesIDL.has(type.name) || enums.has(type.name)) {
         throw new Error(`Overloaded type ${type.name}`);
       }
