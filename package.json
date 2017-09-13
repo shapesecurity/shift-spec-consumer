@@ -1,6 +1,6 @@
 {
   "name": "shift-spec-consumer",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Parse shift-spec into a more usable form",
   "author": "Shape Security",
   "homepage": "https://github.com/shapesecurity/shift-spec-consumer",
